@@ -123,6 +123,7 @@ pcl::visualization::PCLVisualizer::PCLVisualizer (const std::string &name, const
   , shape_actor_map_ (new ShapeActorMap)
   , coordinate_actor_map_ (new CoordinateActorMap)
   , camera_set_ ()
+  , camera_file_loaded_ (false)
 {
   // Create a Renderer
   vtkSmartPointer<vtkRenderer> ren = vtkSmartPointer<vtkRenderer>::New ();
@@ -188,6 +189,7 @@ pcl::visualization::PCLVisualizer::PCLVisualizer (int &argc, char **argv, const 
   , shape_actor_map_ (new ShapeActorMap)
   , coordinate_actor_map_ ()
   , camera_set_ ()
+  , camera_file_loaded_ (false)
 {
   // Create a Renderer
   vtkSmartPointer<vtkRenderer> ren = vtkSmartPointer<vtkRenderer>::New ();
@@ -240,8 +242,7 @@ pcl::visualization::PCLVisualizer::PCLVisualizer (int &argc, char **argv, const 
     {
       if (boost::filesystem::exists (camera_file) && style_->loadCameraParameters (camera_file))
       {
-        pcl::console::print_info ("\nRestore camera parameters from %s.\n", camera_file.c_str ());
-        camera_set_ = true;
+        camera_file_loaded_ = true;
       }
       else
       {
@@ -250,7 +251,7 @@ pcl::visualization::PCLVisualizer::PCLVisualizer (int &argc, char **argv, const 
     }
   }
   // Set the window size as 1/2 of the screen size or the user given parameter
-  if (!camera_set_)
+  if (!camera_set_ && !camera_file_loaded_)
   {
     win_->SetSize (scr_size[0]/2, scr_size[1]/2);
     win_->SetPosition (0, 0);
@@ -574,6 +575,8 @@ pcl::visualization::PCLVisualizer::removeCoordinateSystem (int viewport)
 void
 pcl::visualization::PCLVisualizer::addCoordinateSystem (double scale, const std::string &id, int viewport)
 {
+  if (scale <= 0.0)
+    scale = 1.0;
   vtkSmartPointer<vtkAxes> axes = vtkSmartPointer<vtkAxes>::New ();
   axes->SetOrigin (0, 0, 0);
   axes->SetScaleFactor (scale);
@@ -621,6 +624,8 @@ pcl::visualization::PCLVisualizer::addCoordinateSystem (double scale, const std:
 void
 pcl::visualization::PCLVisualizer::addCoordinateSystem (double scale, float x, float y, float z, const std::string& id, int viewport)
 {
+  if (scale <= 0.0)
+    scale = 1.0;
   vtkSmartPointer<vtkAxes> axes = vtkSmartPointer<vtkAxes>::New ();
   axes->SetOrigin (0, 0, 0);
   axes->SetScaleFactor (scale);
@@ -699,6 +704,8 @@ double q[4];
 void
 pcl::visualization::PCLVisualizer::addCoordinateSystem (double scale, const Eigen::Affine3f& t, const std::string& id, int viewport)
 {
+  if (scale <= 0.0)
+    scale = 1.0;
   vtkSmartPointer<vtkAxes> axes = vtkSmartPointer<vtkAxes>::New ();
   axes->SetOrigin (0, 0, 0);
   axes->SetScaleFactor (scale);
@@ -1744,6 +1751,20 @@ bool
 pcl::visualization::PCLVisualizer::cameraParamsSet () const
 {
   return (camera_set_);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+bool
+pcl::visualization::PCLVisualizer::cameraFileLoaded () const
+{
+  return (camera_file_loaded_);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+std::string
+pcl::visualization::PCLVisualizer::getCameraFile () const
+{
+  return (style_->getCameraFile ());
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

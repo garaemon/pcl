@@ -455,12 +455,11 @@ pcl::visualization::PCLVisualizerInteractorStyle::OnChar ()
     case 'u': case 'U':
     case 'q': case 'Q':
     case 'x': case 'X':
+    case 'r': case 'R':
     {
       break;
     }
-    // R have a special !CTRL case
-    // S have special !ALT and !CTRL case
-    case 'r': case 'R':
+    // S have special !ALT case
     case 's': case 'S':
     {
       if (!keymod)
@@ -763,6 +762,7 @@ pcl::visualization::PCLVisualizerInteractorStyle::OnKeyDown ()
                   "          g, G   : display scale grid (on/off)\n"
                   "          u, U   : display lookup table (on/off)\n"
                   "\n"
+                  "    o, O         : switch between perspective/parallel projection (default = perspective)\n"
                   "    r, R [+ ALT] : reset camera [to viewpoint = {0, 0, 0} -> center_{x, y, z}]\n"
                   "    CTRL + s, S  : save camera parameters\n"
                   "    CTRL + r, R  : restore camera parameters\n"
